@@ -2,6 +2,9 @@
 
 ## PyNWB 2.8.3 (Upcoming)
 
+### Enhancements and minor changes
+* Added `NWBHDF5IO.read_nwb` convenience method to simplify reading an NWB file. @h-mayorquin [#1979](https://github.com/NeurodataWithoutBorders/pynwb/pull/1979)
+
 ### Documentation and tutorial enhancements
 - Added documentation example for `SpikeEventSeries`. @stephprince [#1983](https://github.com/NeurodataWithoutBorders/pynwb/pull/1983)
 

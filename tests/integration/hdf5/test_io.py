@@ -18,6 +18,13 @@ from pynwb.testing import remove_test_file, TestCase
 from pynwb.testing.mock.file import mock_NWBFile
 
 
+import unittest
+try:
+    import fsspec # noqa f401
+    HAVE_FSSPEC = True 
+except ImportError:
+    HAVE_FSSPEC = False
+
 class TestHDF5Writer(TestCase):
 
     _required_tests = ('test_nwbio', 'test_write_clobber', 'test_write_cache_spec', 'test_write_no_cache_spec')
@@ -586,3 +593,38 @@ class TestNWBHDF5IO(TestCase):
     def test_can_read_file_invalid_hdf5_file(self):
         # current file is not an HDF5 file
         self.assertFalse(NWBHDF5IO.can_read(__file__))
+
+    def test_read_nwb_method_path(self):
+        
+        # write the example file
+        with NWBHDF5IO(self.path, 'w') as io:
+            io.write(self.nwbfile)
+            
+        # test that the read_nwb method works
+        read_nwbfile = NWBHDF5IO.read_nwb(path=self.path)
+        self.assertContainerEqual(read_nwbfile, self.nwbfile)
+
+        read_nwbfile.get_read_io().close()
+        
+    def test_read_nwb_method_file(self):
+        
+        # write the example file
+        with NWBHDF5IO(self.path, 'w') as io:
+            io.write(self.nwbfile)
+            
+        import h5py
+        
+        file = h5py.File(self.path, 'r')
+        
+        read_nwbfile = NWBHDF5IO.read_nwb(file=file)
+        self.assertContainerEqual(read_nwbfile, self.nwbfile)
+
+        read_nwbfile.get_read_io().close()
+    
+    @unittest.skipIf(not HAVE_FSSPEC, "fsspec library not available")
+    def test_read_nwb_method_s3_path(self):
+        s3_test_path = "https://dandiarchive.s3.amazonaws.com/blobs/11e/c89/11ec8933-1456-4942-922b-94e5878bb991"
+        read_nwbfile = NWBHDF5IO.read_nwb(path=s3_test_path)
+        assert read_nwbfile.identifier == "3f77c586-6139-4777-a05d-f603e90b1330"
+    
+        assert read_nwbfile.subject.subject_id == "1"

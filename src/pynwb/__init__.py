@@ -538,7 +538,7 @@ class NWBHDF5IO(_HDF5IO):
 @docval({'name': 'path', 'type': (str, Path), 'doc': 'the path to the nwbfile'}, 
         is_method=False)
 def read_nwb(**kwargs):
-    """Read an NWB file from a local path or remote URL.
+    """Read an NWB file from a local path.
 
     High-level interface for reading NWB files. Automatically handles both HDF5 
     and Zarr formats. For advanced use cases (parallel I/O, custom namespaces), 

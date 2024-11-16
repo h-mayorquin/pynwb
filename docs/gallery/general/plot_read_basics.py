@@ -108,8 +108,9 @@ nwbfile = read_nwb(filepath)
 nwbfile
 
 #######################################
-# For more advance use, use the :py:class:`~pynwb.NWBHDF5IO`. Here, we show how it can be used as a context manager
-# to read data from an NWB file in a more controlled way:
+# For more advanced use cases, the :py:class:~pynwb.NWBHDF5IO class provides additional functionality. 
+# Below, we demonstrate how :py:class:~pynwb.NWBHDF5IO can be used as a context manager 
+# to read data from an NWB file in a more controlled manner:
 
 from pynwb import NWBHDF5IO
 with NWBHDF5IO(filepath, mode="r") as io2:

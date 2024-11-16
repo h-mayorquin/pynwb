@@ -540,9 +540,9 @@ class NWBHDF5IO(_HDF5IO):
 def read_nwb(**kwargs):
     """Read an NWB file from a local path or remote URL.
 
-    Provides a simple, high-level interface for reading NWB files in the most 
-    common use cases. Automatically handles both HDF5 and Zarr formats.
-    For advanced use cases (parallel I/O, custom namespaces), use NWBHDF5IO or NWBZarrIO.
+    High-level interface for reading NWB files. Automatically handles both HDF5 
+    and Zarr formats. For advanced use cases (parallel I/O, custom namespaces), 
+    use NWBHDF5IO or NWBZarrIO.
 
     Parameters
     ----------
@@ -566,7 +566,6 @@ def read_nwb(**kwargs):
     * Always opens in read-only mode
     * Automatically loads namespaces
     * Detects file format based on extension
-    * Automatically handles local and remote paths
 
     Advanced features requiring direct use of IO classes include:
     * Streaming data from s3

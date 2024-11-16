@@ -5,6 +5,7 @@
 ### Enhancements and minor changes
 * Added `NWBHDF5IO.read_nwb` convenience method to simplify reading an NWB file. @h-mayorquin [#1979](https://github.com/NeurodataWithoutBorders/pynwb/pull/1979)
 * Removed unused references to region references and builders in preparation for changes in HDMF 4.0. @rly [#1991](https://github.com/NeurodataWithoutBorders/pynwb/pull/1991)
+* Added `pynwb.read_nwb` convenience method to simplif yreading an NWBFile written with any backend @h-mayorquin [#1994](https://github.com/NeurodataWithoutBorders/pynwb/pull/1994)
 
 ### Documentation and tutorial enhancements
 - Added documentation example for `SpikeEventSeries`. @stephprince [#1983](https://github.com/NeurodataWithoutBorders/pynwb/pull/1983)

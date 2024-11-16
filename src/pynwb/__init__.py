@@ -535,6 +535,72 @@ class NWBHDF5IO(_HDF5IO):
 
         return nwbfile
 
+@docval({'name': 'path', 'type': (str, Path), 'doc': 'the path to the nwbfile'}, 
+        is_method=False)
+def read_nwb(**kwargs):
+    """Read an NWB file from a local path or remote URL.
+
+    Provides a simple, high-level interface for reading NWB files in the most 
+    common use cases. Automatically handles both HDF5 and Zarr formats.
+    For advanced use cases (parallel I/O, custom namespaces), use NWBHDF5IO or NWBZarrIO.
+
+    Parameters
+    ----------
+    path : str or pathlib.Path
+        Path to the NWB file. Can be either a local filesystem path to an HDF5 (.nwb) 
+        or Zarr (.zarr) file
+
+    Returns
+    -------
+    pynwb.NWBFile
+        The loaded NWB file object.
+
+    See Also
+    --------
+    pynwb.NWBHDF5IO : Core I/O class for HDF5 files with advanced options.
+    hdmf_zarr.nwb.NWBZarrIO : Core I/O class for Zarr files with advanced options.
+
+    Notes
+    -----
+    This function uses the following defaults:
+    * Always opens in read-only mode
+    * Automatically loads namespaces
+    * Detects file format based on extension
+    * Automatically handles local and remote paths
+
+    Advanced features requiring direct use of IO classes include:
+    * Streaming data from s3
+    * Custom namespace extensions
+    * Parallel I/O with MPI
+    * Custom build managers
+    * Write or append modes
+    * Pre-opened HDF5 file objects or Zarr stores
+    * Remote file access configuration
+
+    Examples
+    --------
+    Read a local NWB file:
+
+    >>> from pynwb import read_nwb
+    >>> nwbfile = read_nwb("path/to/file.nwb")
+
+    
+    """
+    
+    path = popargs('path', kwargs)
+    backend_is_hdf5 = NWBHDF5IO.can_read(path=path)
+    if backend_is_hdf5:
+        return NWBHDF5IO.read_nwb(path=path)
+    else:
+        from hdmf_zarr import NWBZarrIO
+        backend_is_zarr = NWBZarrIO.can_read(path=path)
+        if backend_is_zarr:
+            return NWBZarrIO.read_nwb(path=path) 
+        else:
+            raise ValueError(f"Unsupported backend for file: {path}")    
+    
+
+
 from . import io as __io  # noqa: F401,E402
 from .core import NWBContainer, NWBData  # noqa: F401,E402
 from .base import TimeSeries, ProcessingModule  # noqa: F401,E402

@@ -613,7 +613,6 @@ class TestNWBHDF5IO(TestCase):
             io.write(self.nwbfile)
             
         import h5py
-        
         file = h5py.File(self.path, 'r')
         
         read_nwbfile = NWBHDF5IO.read_nwb(file=file)
@@ -628,3 +627,6 @@ class TestNWBHDF5IO(TestCase):
         assert read_nwbfile.identifier == "3f77c586-6139-4777-a05d-f603e90b1330"
     
         assert read_nwbfile.subject.subject_id == "1"
+        
+        
+        

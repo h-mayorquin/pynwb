@@ -30,7 +30,6 @@ clarity, we define them here:
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pynwb import NWBHDF5IO
 
 ####################
 # We will access NWB data on the `DANDI Archive <https://gui.dandiarchive.org/>`_,
@@ -103,14 +102,16 @@ download("https://api.dandiarchive.org/api/assets/0f57f0b0-f021-42bb-8eaa-56cd48
 # read the data into a :py:class:`~pynwb.file.NWBFile` object.
 
 filepath = "sub-P11HMH_ses-20061101_ecephys+image.nwb"
-# Open the file in read mode "r",
-io = NWBHDF5IO(filepath, mode="r")
-nwbfile = io.read()
+from pynwb import read_nwb
+
+nwbfile = read_nwb(filepath)
 nwbfile
 
 #######################################
-# :py:class:`~pynwb.NWBHDF5IO` can also be used as a context manager:
+# For more advance use, use the :py:class:`~pynwb.NWBHDF5IO`. Here, we show how it can be used as a context manager
+# to read data from an NWB file in a more controlled way:
 
+from pynwb import NWBHDF5IO
 with NWBHDF5IO(filepath, mode="r") as io2:
     nwbfile2 = io2.read()
 
@@ -291,4 +292,4 @@ for time in stim_on_times_landscapes.iloc[:3]:
 # -----------------------
 # It is good practice, especially on Windows, to close any files that you have opened.
 
-io.close()
+nwbfile.get_read_io().close()

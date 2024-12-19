@@ -5,11 +5,12 @@
 ### Enhancements and minor changes
 - Added `pynwb.read_nwb` convenience method to simplify reading an NWBFile written with any backend @h-mayorquin [#1994](https://github.com/NeurodataWithoutBorders/pynwb/pull/1994)
 - Added support for NWB schema 2.8.0. @rly [#2001](https://github.com/NeurodataWithoutBorders/pynwb/pull/2001)
-- Removed `SpatialSeries.bounds` field that was not functional. This will be fixed in a future release. @rly [#1907](https://github.com/NeurodataWithoutBorders/pynwb/pull/1907), [#1996](https://github.com/NeurodataWithoutBorders/pynwb/pull/1996)
-- Added support for `NWBFile.was_generated_by` field. @stephprince [#1924](https://github.com/NeurodataWithoutBorders/pynwb/pull/1924)
-- Added support for `model_number`, `model_name`, and `serial_number` fields to `Device`. @stephprince [#1997](https://github.com/NeurodataWithoutBorders/pynwb/pull/1997)
-- Deprecated `EventWaveform` neurodata type. @rly [#1940](https://github.com/NeurodataWithoutBorders/pynwb/pull/1940)
-- Deprecated `ImageMaskSeries` neurodata type. @rly [#1941](https://github.com/NeurodataWithoutBorders/pynwb/pull/1941)
+  - Removed `SpatialSeries.bounds` field that was not functional. This will be fixed in a future release. @rly [#1907](https://github.com/NeurodataWithoutBorders/pynwb/pull/1907), [#1996](https://github.com/NeurodataWithoutBorders/pynwb/pull/1996)
+  - Added support for `NWBFile.was_generated_by` field. @stephprince [#1924](https://github.com/NeurodataWithoutBorders/pynwb/pull/1924)
+  - Added support for `model_number`, `model_name`, and `serial_number` fields to `Device`. @stephprince [#1997](https://github.com/NeurodataWithoutBorders/pynwb/pull/1997)
+  - Deprecated `EventWaveform` neurodata type. @rly [#1940](https://github.com/NeurodataWithoutBorders/pynwb/pull/1940)
+  - Deprecated `ImageMaskSeries` neurodata type. @rly [#1941](https://github.com/NeurodataWithoutBorders/pynwb/pull/1941)
+- Removed python 3.8 support, added python 3.13 support. @stephprince [#2007](https://github.com/NeurodataWithoutBorders/pynwb/pull/2007)
 
 ## PyNWB 2.8.3 (November 19, 2024)
 

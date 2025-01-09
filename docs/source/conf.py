@@ -147,8 +147,8 @@ intersphinx_mapping = {
     'fsspec': ("https://filesystem-spec.readthedocs.io/en/latest/", None),
     'nwbwidgets': ("https://nwb-widgets.readthedocs.io/en/latest/", None),
     'nwb-overview': ("https://nwb-overview.readthedocs.io/en/latest/", None),
-    'zarr': ("https://zarr.readthedocs.io/en/stable/", None),
-    'hdmf-zarr': ("https://hdmf-zarr.readthedocs.io/en/latest/", None),
+    'zarr': ("https://zarr.readthedocs.io/en/v2.18.4/", None),  # TODO - update when hdmf-zarr supports Zarr 3.0
+    'hdmf-zarr': ("https://hdmf-zarr.readthedocs.io/en/stable/", None),
     'numcodecs': ("https://numcodecs.readthedocs.io/en/latest/", None),
 }
 
@@ -161,7 +161,7 @@ extlinks = {
     'hdmf-docs': ('https://hdmf.readthedocs.io/en/stable/%s', '%s'),
     'dandi': ('https://www.dandiarchive.org/%s', '%s'),
     "nwbinspector": ("https://nwbinspector.readthedocs.io/en/dev/%s", "%s"),
-    'hdmf-zarr': ('https://hdmf-zarr.readthedocs.io/en/latest/%s', '%s'),
+    'hdmf-zarr': ('https://hdmf-zarr.readthedocs.io/en/stable/%s', '%s'),
 }
 
 nitpicky = True

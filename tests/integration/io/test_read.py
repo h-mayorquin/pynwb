@@ -61,7 +61,7 @@ class TestReadNWBMethod(TestCase):
             with self.assertRaisesWith(ValueError, expected_message):
                 read_nwb(path=path)
         
-    @unittest.skipIf(not HAVE_NWBZarrIO, "NWBZarrIO library not available. Neeed for correct error message.")
+    @unittest.skipIf(not HAVE_NWBZarrIO, "NWBZarrIO library not available. Need for correct error message.")
     def test_read_invalid_file(self):
         """Test attempting to read a file that exists but is neither HDF5 nor Zarr."""
         with tempfile.TemporaryDirectory() as temp_dir:

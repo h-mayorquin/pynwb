@@ -355,6 +355,25 @@ class NWBHDF5IO(_HDF5IO):
     @staticmethod
     def can_read(path: str):
         """Determine whether a given path is readable by this class"""
+        # Handle remote paths (s3://, http://, https://)
+        if path.startswith(("s3://", "http://", "https://")):
+            try:
+                import fsspec
+                fs = fsspec.filesystem("http" if path.startswith("http") else "s3")
+                with fs.open(path, "rb") as f:
+                    with h5py.File(f, "r") as file:
+                        version_info = get_nwbfile_version(file)
+                        if version_info[0] is None:
+                            warn("Cannot read because missing NWB version in the HDF5 file. The file is not a valid NWB file.")
+                            return False
+                        elif version_info[1][0] < 2:    # Major versions of NWB < 2 not supported
+                            warn("Cannot read because PyNWB supports NWB files version 2 and above.")
+                            return False
+                        else:
+                            return True
+            except (ImportError, IOError):
+                return False
+        # Handle local paths
         if not os.path.isfile(path):  # path is file that exists
             return False
         try:
@@ -508,7 +527,8 @@ class NWBHDF5IO(_HDF5IO):
             is_method=False)
     def read_nwb(**kwargs):
         """
-        Helper factory method for reading an NWB file and return the NWBFile object
+        Helper factory method for reading an NWB file and return the NWBFile object.
+        Supports both local and remote (S3/HTTP) paths using fsspec.
         """
         # Retrieve the filepath
         path = popargs('path', kwargs)
@@ -516,31 +536,38 @@ class NWBHDF5IO(_HDF5IO):
         
         path = str(path) if path is not None else None
 
-        # Streaming case
-        if path is not None and (path.startswith("s3://") or path.startswith("http")):
-            import fsspec
-            fsspec_file_system = fsspec.filesystem("http")
-            ffspec_file = fsspec_file_system.open(path, "rb")
+        # Handle remote paths (s3://, http://, https://)
+        if path is not None and (path.startswith(("s3://", "http://", "https://"))):
+            try:
+                import fsspec
+                fs = fsspec.filesystem("http" if path.startswith("http") else "s3")
+                fs_file = fs.open(path, "rb")
+                open_file = h5py.File(fs_file, "r")
+                io = NWBHDF5IO(file=open_file)
+                nwbfile = io.read()
+                return nwbfile
 
-            open_file = h5py.File(ffspec_file, "r")
-            io = NWBHDF5IO(file=open_file)
-            nwbfile = io.read()
+            except ImportError:
+                raise ValueError(
+                    f"Unable to read remote file: '{path}'. The fsspec package is required "
+                    "for reading remote files. Please install it using: pip install fsspec"
+                )
+        # Handle local paths
         else:
             io = NWBHDF5IO(path=path, file=file, mode="r", load_namespaces=True)
             nwbfile = io.read()
-
-        return nwbfile
+            return nwbfile
 
 @docval({'name': 'path', 'type': (str, Path), 
-         'doc': 'Path to the NWB file. Can be either a local filesystem path to '
-                'an HDF5 (.nwb) or Zarr (.zarr) file.'}, 
+         'doc': 'Path to the NWB file. Can be a local filesystem path, HTTP URL, or S3 URL '
+                'to an HDF5 (.nwb) or Zarr (.zarr) file.'}, 
         is_method=False)
 def read_nwb(**kwargs):
-    """Read an NWB file from a local path.
+    """Read an NWB file from a local path or remote URL.
 
     High-level interface for reading NWB files. Automatically handles both HDF5 
-    and Zarr formats. For advanced use cases (parallel I/O, custom namespaces), 
-    use NWBHDF5IO or NWBZarrIO.
+    and Zarr formats from local paths or remote URLs (HTTP/S3). For advanced use cases 
+    (parallel I/O, custom namespaces), use NWBHDF5IO or NWBZarrIO.
 
     See also 
         * :py:class:`~pynwb.NWBHDF5IO`: Core I/O class for HDF5 files with advanced options.
@@ -550,23 +577,31 @@ def read_nwb(**kwargs):
         This function uses the following defaults:
             * Always opens in read-only mode
             * Automatically loads namespaces
-            * Reads any backend (e.g. HDF5 or Zarr) if there is an IO class available.
+            * Reads any backend (e.g. HDF5 or Zarr) if there is an IO class available
+            * Automatically handles remote files using fsspec
 
         Advanced features requiring direct use of IO classes (e.g. NWBHDF5IO NWBZarrIO) include:
-            * Streaming data from s3
             * Custom namespace extensions
             * Parallel I/O with MPI
             * Custom build managers
             * Write or append modes
             * Pre-opened HDF5 file objects or Zarr stores
-            * Remote file access configuration
+            * Advanced remote file access configuration
  
-    Example usage reading a local NWB file:
+    Example usage:
 
     .. code-block:: python
 
         from pynwb import read_nwb
-        nwbfile = read_nwb("path/to/file.nwb")    
+        
+        # Read local file
+        nwbfile = read_nwb("path/to/file.nwb")
+        
+        # Read from S3 via HTTP
+        nwbfile = read_nwb("https://mybucket.s3.amazonaws.com/file.nwb")
+        
+        # Read from S3 directly
+        nwbfile = read_nwb("s3://mybucket/file.nwb")
 
     :Returns: pynwb.NWBFile The loaded NWB file object.
     """

@@ -1,5 +1,6 @@
 from pathlib import Path
 import tempfile
+import warnings
 
 from pynwb import read_nwb
 from pynwb.testing.mock.file import mock_NWBFile
@@ -12,9 +13,15 @@ try:
 except ImportError:
     HAVE_NWBZarrIO = False
 
+try:
+    import fsspec  # noqa f401
+    HAVE_FSSPEC = True
+except ImportError:
+    HAVE_FSSPEC = False
+
 
 class TestReadNWBMethod(TestCase):
-    """Test suite for the read_nwb function."""
+    """Test suite for the read_nwb function with local files."""
     
     def setUp(self):
         self.nwbfile = mock_NWBFile()
@@ -75,3 +82,48 @@ class TestReadNWBMethod(TestCase):
             
             with self.assertRaisesWith(ValueError, expected_message):
                 read_nwb(path=path)
+
+
+class TestReadNWBOnline(TestCase):
+    """Test suite for reading NWB files from remote locations (S3, HTTP)."""
+
+    @classmethod
+    def setUpClass(cls):
+        # Example S3 paths for testing - both HTTP and native S3 protocols
+        cls.hdf5_path = "https://dandiarchive.s3.amazonaws.com/ros3test.nwb"
+        cls.zarr_path = "https://dandiarchive.s3.amazonaws.com/ros3test.zarr"
+
+
+    def setUp(self):
+        if not HAVE_FSSPEC:
+            self.skipTest("fsspec not installed")
+
+    def test_reading_hdf5(self):
+        """Test reading HDF5 file via HTTP from S3 using read_nwb"""
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message=r"Ignoring cached namespace .*",
+                category=UserWarning,
+            )
+            nwbfile = read_nwb(path=self.hdf5_path)
+            test_data = nwbfile.acquisition['ts_name'].data[:]
+            self.assertEqual(len(test_data), 3)
+            nwbfile.get_read_io().close()
+
+
+
+    @unittest.skipIf(not HAVE_NWBZarrIO, "NWBZarrIO library not available")
+    def test_reading_zarr(self):
+        """Test reading Zarr store via HTTP from S3 using read_nwb"""
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message=r"Ignoring cached namespace .*",
+                category=UserWarning,
+            )
+            nwbfile = read_nwb(path=self.zarr_path)
+            test_data = nwbfile.acquisition['ts_name'].data[:]
+            self.assertEqual(len(test_data), 3)
+            nwbfile.get_read_io().close()
+
